@@ -45,6 +45,10 @@
     "@types/prop-types" "*"
     csstype "^2.2.0"
 
+"@types/three@^0.93.14":
+  version "0.93.14"
+  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.93.14.tgz#59d6a1483502beb2cd1aaf1976ad23900b3770cc"
+
 abab@^1.0.3:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/abab/-/abab-1.0.4.tgz#5faad9c2c07f60dd76770f71cf025b62a63cfd4e"
@@ -3310,6 +3314,10 @@ inquirer@3.3.0:
     string-width "^2.1.0"
     strip-ansi "^4.0.0"
     through "^2.3.6"
+
+install@^0.12.2:
+  version "0.12.2"
+  resolved "https://registry.yarnpkg.com/install/-/install-0.12.2.tgz#ea10e9b2cbb5b0484f25080b24b5b34429d9f564"
 
 internal-ip@1.2.0:
   version "1.2.0"
@@ -6696,6 +6704,10 @@ test-exclude@^4.2.1:
 text-table@0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
+
+three@^0.99.0:
+  version "0.99.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.99.0.tgz#65711fda7a16501da83948121437d824df1fea19"
 
 throat@^3.0.0:
   version "3.2.0"
