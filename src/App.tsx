@@ -13,6 +13,7 @@ class App extends React.Component {
   public render() {
     return (
       <div
+        className="main"
         ref={element => (this.threeRootElement = element as HTMLDivElement)}
       />
     );

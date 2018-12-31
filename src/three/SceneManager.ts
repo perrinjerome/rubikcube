@@ -1,12 +1,13 @@
 import * as THREE from "three";
-
+import TrackballControls from "./TrackballControl";
 import { ISceneObject } from "./interfaces";
-import Cube from "./Cube";
+import RubikCube from "./RubikCube";
 
 interface IMousePosition {
   x: number;
   y: number;
 }
+
 interface IScreenDimension {
   width: number;
   height: number;
@@ -17,11 +18,13 @@ class SceneManager {
   private _origin: THREE.Vector3;
   private _scene: THREE.Scene;
   private _renderer: THREE.WebGLRenderer;
-  private _camera: THREE.Camera;
+  private _camera: THREE.PerspectiveCamera;
   private _canvas: HTMLCanvasElement;
-  private _mousePosition: IMousePosition;
+  private _controls: TrackballControls;
+  private _mousePosition: IMousePosition; //XXX
   private _screenDimensions: IScreenDimension;
-  private _sceneSubjects: ISceneObject[]; /* XXX */
+  private _sceneSubjects: ISceneObject[];
+  private _paused = true;
 
   constructor(canvas: HTMLCanvasElement) {
     this._canvas = canvas;
@@ -41,12 +44,37 @@ class SceneManager {
     this._scene = this.buildScene();
     this._renderer = this.buildRender(canvas.width, canvas.height);
     this._camera = this.buildCamera(canvas.width, canvas.height);
+    this._controls = new TrackballControls(this._camera);
+    this._controls.rotateSpeed = 1.0;
+    this._controls.zoomSpeed = 1.2;
+    this._controls.panSpeed = 0.8;
+    this._controls.noZoom = false;
+    this._controls.noPan = false;
+    this._controls.staticMoving = true;
+    this._controls.dynamicDampingFactor = 0.3;
+
     this._sceneSubjects = this.createSceneSubjects();
   }
 
   private buildScene() {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color("#444");
+    // debug
+    var helper = new THREE.GridHelper(1000, 40, 0x303030, 0x303030);
+    helper.position.y = -75;
+    scene.add(helper);
+    var axesHelper = new THREE.AxesHelper(5);
+    scene.add(axesHelper);
+
+    scene.add(new THREE.AmbientLight(0x111111, 2));
+
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 0.125);
+    directionalLight.position.x = Math.random() - 0.5;
+    directionalLight.position.y = Math.random() - 0.5;
+    directionalLight.position.z = Math.random() - 0.5;
+    directionalLight.position.normalize();
+    scene.add(directionalLight);
+
     return scene;
   }
 
@@ -77,17 +105,22 @@ class SceneManager {
       nearPlane,
       farPlane
     );
-    camera.position.z = 5;
+
+    camera.position.z = 6;
+    var light = new THREE.PointLight(0xffffff, 1);
+    camera.add(light);
     return camera;
   }
 
   private createSceneSubjects() {
-    const sceneSubjects = [new Cube(this._scene)] as ISceneObject[];
+    const sceneSubjects = [new RubikCube(this)] as ISceneObject[];
     return sceneSubjects;
   }
 
   public update() {
     const elapsedTime = this._clock.getElapsedTime();
+    this._controls.update();
+
     for (let i = 0; i < this._sceneSubjects.length; i++)
       this._sceneSubjects[i].update(elapsedTime);
 
@@ -104,20 +137,31 @@ class SceneManager {
   }
 
   public onWindowResize() {
-    // XXX is this used ?
     const { width, height } = this._canvas;
-
+    console.log("window resized", width, height);
     this._screenDimensions.width = width;
     this._screenDimensions.height = height;
 
-    this._camera.updateMatrix();
+    this._camera.aspect = width / height;
+    this._camera.updateProjectionMatrix();
 
     this._renderer.setSize(width, height);
   }
 
+  public onKeyDown(e: KeyboardEvent) {
+    console.log("onkeydown", e);
+    this._paused = !this._paused;
+  }
   public onMouseMove(x: number, y: number) {
+    console.log("mouse moved");
     this._mousePosition.x = x;
     this._mousePosition.y = y;
+  }
+  get paused() {
+    return this._paused;
+  }
+  get scene() {
+    return this._scene;
   }
 }
 

@@ -14,7 +14,11 @@ export default (containerElement: HTMLDivElement) => {
   }
   function bindEventListeners() {
     window.onresize = resizeCanvas;
+    window.onkeydown = keyDown;
     resizeCanvas();
+  }
+  function keyDown(e: KeyboardEvent) {
+    sceneManager.onKeyDown(e);
   }
   function resizeCanvas() {
     canvas.style.width = "100%";
@@ -24,7 +28,9 @@ export default (containerElement: HTMLDivElement) => {
     sceneManager.onWindowResize();
   }
   function render() {
-    requestAnimationFrame(render);
+    setTimeout(function() {
+      requestAnimationFrame(render);
+    }, 10);
     sceneManager.update();
   }
 };
