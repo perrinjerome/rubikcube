@@ -1,12 +1,7 @@
 import * as THREE from "three";
 import TrackballControls from "./TrackballControl";
 import { ISceneObject } from "./interfaces";
-import RubikCube from "./RubikCube";
-
-interface IMousePosition {
-  x: number;
-  y: number;
-}
+import RubikCube from "../rubik/RubikCube";
 
 interface IScreenDimension {
   width: number;
@@ -15,13 +10,11 @@ interface IScreenDimension {
 
 class SceneManager {
   private _clock: THREE.Clock;
-  private _origin: THREE.Vector3;
   private _scene: THREE.Scene;
   private _renderer: THREE.WebGLRenderer;
   private _camera: THREE.PerspectiveCamera;
   private _canvas: HTMLCanvasElement;
   private _controls: TrackballControls;
-  private _mousePosition: IMousePosition; //XXX
   private _screenDimensions: IScreenDimension;
   private _sceneSubjects: ISceneObject[];
   private _paused = true;
@@ -29,16 +22,10 @@ class SceneManager {
   constructor(canvas: HTMLCanvasElement) {
     this._canvas = canvas;
     this._clock = new THREE.Clock();
-    this._origin = new THREE.Vector3(0, 0, 0);
 
     this._screenDimensions = {
       width: canvas.width,
       height: canvas.height
-    };
-
-    this._mousePosition = {
-      x: 0,
-      y: 0
     };
 
     this._scene = this.buildScene();
@@ -124,16 +111,7 @@ class SceneManager {
     for (let i = 0; i < this._sceneSubjects.length; i++)
       this._sceneSubjects[i].update(elapsedTime);
 
-    this.updateCameraPositionRelativeToMouse();
     return this._renderer.render(this._scene, this._camera);
-  }
-
-  private updateCameraPositionRelativeToMouse() {
-    this._camera.position.x +=
-      (this._mousePosition.x * 0.01 - this._camera.position.x) * 0.01;
-    this._camera.position.y +=
-      (-(this._mousePosition.y * 0.01) - this._camera.position.y) * 0.01;
-    this._camera.lookAt(this._origin);
   }
 
   public onWindowResize() {
@@ -151,11 +129,6 @@ class SceneManager {
   public onKeyDown(e: KeyboardEvent) {
     console.log("onkeydown", e);
     this._paused = !this._paused;
-  }
-  public onMouseMove(x: number, y: number) {
-    console.log("mouse moved");
-    this._mousePosition.x = x;
-    this._mousePosition.y = y;
   }
   get paused() {
     return this._paused;

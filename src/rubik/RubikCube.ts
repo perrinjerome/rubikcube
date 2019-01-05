@@ -1,7 +1,21 @@
-import { ISceneObject } from "./interfaces";
+import { ISceneObject } from "../three/interfaces";
 import * as THREE from "three";
 import * as Colors from "./colors";
-import SceneManager from "./SceneManager";
+import SceneManager from "../three/SceneManager";
+
+declare type RubikMove =
+  | "U"
+  | "D"
+  | "L"
+  | "R"
+  | "F"
+  | "B"
+  | "U'"
+  | "D'"
+  | "L'"
+  | "R'"
+  | "F'"
+  | "B'";
 
 interface ICubeFaces {
   top?: Colors.Color;
@@ -16,26 +30,6 @@ export default class RubikCube implements ISceneObject {
   private _cube: THREE.Object3D;
   private _sceneManager: SceneManager;
   private _pieces: THREE.Mesh[];
-
-  private _makeCornerPiece(
-    cubedef: ICubeFaces,
-    // x, y, z => tranlation
-    x: number,
-    y: number,
-    z: number
-  ): THREE.Mesh {
-    const geometry = new THREE.BoxGeometry(0.9, 0.9, 0.9);
-    geometry.translate(x, y, z);
-    const materials: THREE.Material[] = [
-      Colors.materialMap[cubedef.right || "NONE"],
-      Colors.materialMap[cubedef.left || "NONE"],
-      Colors.materialMap[cubedef.top || "NONE"],
-      Colors.materialMap[cubedef.bottom || "NONE"],
-      Colors.materialMap[cubedef.front || "NONE"],
-      Colors.materialMap[cubedef.right || "NONE"]
-    ];
-    return new THREE.Mesh(geometry, materials);
-  }
 
   constructor(sceneManager: SceneManager) {
     this._sceneManager = sceneManager;
@@ -145,6 +139,28 @@ export default class RubikCube implements ISceneObject {
       this._cube.rotation.x += 0.01;
       this._cube.rotation.y += 0.01;
     }
+  }
+  public makeMove(move: RubikMove) {
+    console.log("making move", move);
+  }
+  private _makeCornerPiece(
+    cubedef: ICubeFaces,
+    // x, y, z => tranlation
+    x: number,
+    y: number,
+    z: number
+  ): THREE.Mesh {
+    const geometry = new THREE.BoxGeometry(0.9, 0.9, 0.9);
+    geometry.translate(x, y, z);
+    const materials: THREE.Material[] = [
+      Colors.materialMap[cubedef.right || "NONE"],
+      Colors.materialMap[cubedef.left || "NONE"],
+      Colors.materialMap[cubedef.top || "NONE"],
+      Colors.materialMap[cubedef.bottom || "NONE"],
+      Colors.materialMap[cubedef.front || "NONE"],
+      Colors.materialMap[cubedef.right || "NONE"]
+    ];
+    return new THREE.Mesh(geometry, materials);
   }
 }
 
