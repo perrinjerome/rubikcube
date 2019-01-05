@@ -1,22 +1,32 @@
 import * as React from "react";
 import "./App.css";
 
-import threeEntryPoint from "./three/threeEntryPoint";
+import ColorDetection from "./views/ColorDetection";
+import Cube3D from "./views/Cube3D";
 
-class App extends React.Component {
-  public threeRootElement: HTMLDivElement;
+type Activity = "colorRecognition" | "cubeSolving";
 
-  public componentDidMount() {
-    threeEntryPoint(this.threeRootElement);
+export interface Props {
+  activity?: Activity;
+}
+
+class App extends React.Component<Props, Props> {
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      activity: "colorRecognition"
+    };
+    /*
+    setTimeout(_ => {
+      this.setState({ activity: "cubeSolving" });
+    }, 5000);
+*/
   }
-
   public render() {
-    return (
-      <div
-        className="main"
-        ref={element => (this.threeRootElement = element as HTMLDivElement)}
-      />
-    );
+    if (this.state.activity == "colorRecognition") {
+      return <ColorDetection />;
+    }
+    return <Cube3D />;
   }
 }
 
