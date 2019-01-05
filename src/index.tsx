@@ -1,8 +1,22 @@
+import "./index.css";
+
+/*
+// react
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import App from "./App";
-import "./index.css";
-import registerServiceWorker from "./registerServiceWorker";
 
 ReactDOM.render(<App />, document.getElementById("root") as HTMLElement);
-registerServiceWorker();
+*/
+
+// no react (a bit faster build)
+const root = document.getElementById("root") as HTMLDivElement;
+// XXX set class main as we did in jsx
+import "./App.css";
+root.className = "main";
+
+import threeEntryPoint from "./three/threeEntryPoint";
+threeEntryPoint(root);
+
+//import registerServiceWorker from "./registerServiceWorker";
+//registerServiceWorker();
