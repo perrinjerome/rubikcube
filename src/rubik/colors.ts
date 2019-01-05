@@ -3,7 +3,7 @@ import { MeshLambertMaterial } from "three";
 
 export const RED = new Color(0xff0000);
 export const GREEN = new Color(0x00ff00);
-export const ORANGE = new Color(0xffaa00);
+export const ORANGE = new Color(0xff7700);
 export const BLUE = new Color(0x0000ff);
 export const YELLOW = new Color(0xffff00);
 export const WHITE = new Color(0xfffff);
@@ -24,7 +24,7 @@ export const materialMap = {
   BLUE: new MeshLambertMaterial({ color: BLUE }),
   YELLOW: new MeshLambertMaterial({ color: YELLOW }),
   WHITE: new MeshLambertMaterial({ color: WHITE }),
-  NONE: new MeshLambertMaterial({ color: 0x888888 })
+  NONE: new MeshLambertMaterial({ color: 0x0 })
 };
 
 export type Color =

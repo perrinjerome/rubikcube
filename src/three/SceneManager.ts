@@ -31,6 +31,8 @@ class SceneManager {
     this._scene = this.buildScene();
     this._renderer = this.buildRender(canvas.width, canvas.height);
     this._camera = this.buildCamera(canvas.width, canvas.height);
+
+    // debug control
     this._controls = new TrackballControls(this._camera);
     this._controls.rotateSpeed = 1.0;
     this._controls.zoomSpeed = 1.2;
@@ -53,15 +55,29 @@ class SceneManager {
     var axesHelper = new THREE.AxesHelper(5);
     scene.add(axesHelper);
 
-    scene.add(new THREE.AmbientLight(0x111111, 2));
+    // scene.add(new THREE.AmbientLight(0x111111, 2));
 
+    let lights = [];
+    lights[0] = new THREE.PointLight(0xffffff, 1, 0);
+    lights[1] = new THREE.PointLight(0xffffff, 1, 0);
+    lights[2] = new THREE.PointLight(0xffffff, 1, 0);
+
+    lights[0].position.set(0, 200, 0);
+    lights[1].position.set(100, 200, 100);
+    lights[2].position.set(-100, -200, -100);
+
+    scene.add(lights[0]);
+    scene.add(lights[1]);
+    scene.add(lights[2]);
+
+    /*
     var directionalLight = new THREE.DirectionalLight(0xffffff, 0.125);
     directionalLight.position.x = Math.random() - 0.5;
     directionalLight.position.y = Math.random() - 0.5;
     directionalLight.position.z = Math.random() - 0.5;
     directionalLight.position.normalize();
     scene.add(directionalLight);
-
+*/
     return scene;
   }
 
@@ -114,6 +130,13 @@ class SceneManager {
     return this._renderer.render(this._scene, this._camera);
   }
 
+  public reset() {
+    for (let i = 0; i < this._sceneSubjects.length; i++)
+      this._sceneSubjects[i].reset();
+
+    return this.update();
+  }
+
   public onWindowResize() {
     const { width, height } = this._canvas;
     console.log("window resized", width, height);
@@ -127,8 +150,12 @@ class SceneManager {
   }
 
   public onKeyDown(e: KeyboardEvent) {
-    console.log("onkeydown", e);
-    this._paused = !this._paused;
+    if (e.code == "Space") {
+      this._paused = !this._paused;
+    }
+    if (e.code == "KeyR") {
+      this.reset();
+    }
   }
   get paused() {
     return this._paused;
