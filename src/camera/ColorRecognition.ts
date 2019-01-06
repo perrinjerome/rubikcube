@@ -40,21 +40,52 @@ class ColorRecognition {
   private _video: HTMLVideoElement;
   private _tracker: RubikColorTracker;
 
+  private _recognizedFaces: I2x2FrontFace[];
+
+  /** consecutive frames where a match was found */
+  private _matchingFameCount = 0;
+
   constructor(video: HTMLVideoElement, canvas: HTMLCanvasElement) {
     this._video = video;
     this._canvas = canvas;
     this._tracker = new RubikColorTracker();
+    this._recognizedFaces = [];
   }
 
-  _organiseTrackAsFace(): I2x2FrontFace {
+  /**
+   * Order the tracking rects as topLeft, topRight, bottomLeft and
+   * bottomRight
+   * @param trackRects the rects found by tracking.js
+   */
+  _orderTrackingRectsAs2x2Face(
+    trackRects: tracking.TrackRect[]
+  ): I2x2FrontFace {
+    /* 
+    from https://www.w3.org/TR/2dcontext/
+
+    The 2D context represents a flat Cartesian surface whose origin (0,0) 
+    is at the top left corner, with the coordinate space having x values 
+    increasing when going right, and y values increasing when going down.
+
+    */
+    let ySortedFaces = trackRects.sort((a, b) => a.y - b.y);
+    let [topLeft, topRight] = ySortedFaces
+      .slice(0, 2)
+      .sort((a, b) => a.x - b.x);
+    let [bottomLeft, bottomRight] = ySortedFaces
+      .slice(2, 4)
+      .sort((a, b) => a.x - b.x);
     return {
-      topLeft: colorMapping["yellow"],
-      topRight: "RED",
-      bottomLeft: "RED",
-      bottomRight: "RED"
+      topLeft: colorMapping[topLeft.color as string],
+      topRight: colorMapping[topRight.color as string],
+      bottomLeft: colorMapping[bottomLeft.color as string],
+      bottomRight: colorMapping[bottomRight.color as string]
     };
   }
 
+  /**
+   * use color tracking to find a 2X2 face
+   */
   public regonize2x2Face(): Promise<I2x2FrontFace> {
     return new Promise(resolve => {
       const canvas = this._canvas;
@@ -62,6 +93,8 @@ class ColorRecognition {
       const context = canvas.getContext("2d") as CanvasRenderingContext2D;
       const tracker = this._tracker;
       const colorRecognition = this;
+
+      colorRecognition._matchingFameCount = 0;
 
       const boundingBox = {
         x: 100,
@@ -82,35 +115,54 @@ class ColorRecognition {
           boundingBox.height,
           boundingBox.width
         );
-
+        /*
+        if (event.data.length == 4) {
+          colorRecognition._matchingFameCount += 1;
+        } else {
+          colorRecognition._matchingFameCount = 0;          
+        }
+*/
         if (event.data.length) {
-          let inBB = 0;
-
+          let numberOfRectsInBoundingBox = 0;
           event.data.forEach(rect => {
             if (event.data.length == 4) {
-              console.log("r", rect);
+              console.log("r", rect, colorRecognition._matchingFameCount);
+
+              // is this rect inside the bounding box ?
               if (
                 rect.x >= boundingBox.x &&
                 rect.y >= boundingBox.y &&
                 rect.x + rect.width <= boundingBox.x + boundingBox.width &&
                 rect.y + rect.height <= boundingBox.y + boundingBox.height
               ) {
-                console.log("in :)", rect, inBB);
-                inBB += 1;
+                console.log("in :)", rect, numberOfRectsInBoundingBox);
+                numberOfRectsInBoundingBox += 1;
               }
-              if (inBB == 4) {
+              if (numberOfRectsInBoundingBox == 4) {
+                colorRecognition._matchingFameCount += 1;
+
                 // all in BB
                 context.drawImage(img, boundingBox.x, boundingBox.y);
-                tracker.removeListener("track", trackListener);
-
-                setTimeout(() => {
-                  resolve(colorRecognition._organiseTrackAsFace());
-                }, 4000);
+                if (colorRecognition._matchingFameCount >= 6) {
+                  tracker.removeListener("track", trackListener);
+                  setTimeout(() => {
+                    const face = colorRecognition._orderTrackingRectsAs2x2Face(
+                      event.data
+                    );
+                    colorRecognition._recognizedFaces.push(face);
+                    resolve(face);
+                  }, 4000);
+                }
               }
+            } else {
+              colorRecognition._matchingFameCount = 0;
             }
+
             if (rect.color === "custom") {
               rect.color = (tracker as any).customColor;
             }
+            context.lineWidth = 2 * (colorRecognition._matchingFameCount + 1);
+
             context.strokeStyle = rect.color as string;
             context.strokeRect(rect.x, rect.y, rect.width, rect.height);
             context.font = "11px Helvetica";
@@ -126,6 +178,8 @@ class ColorRecognition {
               rect.y + 22
             );
           });
+        } else {
+          colorRecognition._matchingFameCount = 0;
         }
       });
     });
