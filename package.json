@@ -105,6 +105,7 @@
       }
     }
   },
+  "homepage": "https://perrinjerome.gitlab.io/rubikcube/",
   "babel": {
     "presets": [
       "react-app"
