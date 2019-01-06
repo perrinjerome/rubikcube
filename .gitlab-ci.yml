@@ -8,6 +8,8 @@ pages:
   script:
     - yarn install
     - yarn build
+    - find build
+    - ls
   artifacts:
     paths:
       - build
