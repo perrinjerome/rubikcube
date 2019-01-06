@@ -48,14 +48,13 @@ class SceneManager {
   private buildScene() {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color("#444");
+
     // debug
     var helper = new THREE.GridHelper(1000, 40, 0x303030, 0x303030);
     helper.position.y = -75;
     scene.add(helper);
     var axesHelper = new THREE.AxesHelper(5);
     scene.add(axesHelper);
-
-    // scene.add(new THREE.AmbientLight(0x111111, 2));
 
     let lights = [];
     lights[0] = new THREE.PointLight(0xffffff, 1, 0);
@@ -70,14 +69,6 @@ class SceneManager {
     scene.add(lights[1]);
     scene.add(lights[2]);
 
-    /*
-    var directionalLight = new THREE.DirectionalLight(0xffffff, 0.125);
-    directionalLight.position.x = Math.random() - 0.5;
-    directionalLight.position.y = Math.random() - 0.5;
-    directionalLight.position.z = Math.random() - 0.5;
-    directionalLight.position.normalize();
-    scene.add(directionalLight);
-*/
     return scene;
   }
 

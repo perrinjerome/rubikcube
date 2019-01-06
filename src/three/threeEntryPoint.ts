@@ -28,9 +28,7 @@ export default (containerElement: HTMLDivElement) => {
     sceneManager.onWindowResize();
   }
   function render() {
-    setTimeout(function() {
-      requestAnimationFrame(render);
-    }, 10);
+    requestAnimationFrame(render);
     sceneManager.update();
   }
 };

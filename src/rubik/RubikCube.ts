@@ -27,6 +27,13 @@ interface ICubeFaces {
   right?: Colors.Color;
 }
 
+export interface I2x2FrontFace {
+  topLeft: Colors.Color;
+  topRight: Colors.Color;
+  bottomLeft: Colors.Color;
+  bottomRight: Colors.Color;
+}
+
 // useless ?
 /*
 class CubeFace {

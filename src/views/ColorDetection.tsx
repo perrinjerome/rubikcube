@@ -2,28 +2,41 @@ import * as React from "react";
 
 import "./ColorDetection.css";
 import ColorRecognition from "../camera/ColorRecognition";
+import { CubeType, IFrontFace } from "src/rubik/interfaces";
 
-class ColorDetection extends React.Component {
+interface Props {
+  cubeType: CubeType;
+  onFaceDetected(face: IFrontFace): void;
+}
+
+class ColorDetection extends React.Component<Props, object> {
   cubeCocognition: ColorRecognition;
-  componentDidMount() {
-    this.cubeCocognition = new ColorRecognition();
-    this.cubeCocognition.do();
+  constructor(props: Props) {
+    super(props);
+    this.state = {};
   }
+
+  componentDidMount() {
+    // maximize to full size
+    // TODO: support resize
+    const video = document.getElementById("video") as HTMLVideoElement;
+    const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+    video.width = canvas.width = window.innerWidth;
+    video.height = canvas.height = window.innerHeight;
+
+    // start recognition
+    this.cubeCocognition = new ColorRecognition(video, canvas);
+    this.cubeCocognition.regonize2x2Face().then(face => {
+      console.log("got face !", face);
+      this.props.onFaceDetected(face);
+    });
+  }
+
   public render() {
     return (
-      <div className="demo-frame">
-        <div className="demo-container">
-          <video
-            id="video"
-            width="600"
-            height="450"
-            preload="true"
-            loop
-            muted
-            controls
-          />
-          <canvas id="canvas" width="600" height="450" />
-        </div>
+      <div className="video-container">
+        <video id="video" preload="true" loop muted controls />
+        <canvas id="canvas" />
       </div>
     );
   }
