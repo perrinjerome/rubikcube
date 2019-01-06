@@ -12,6 +12,7 @@ pages:
     - ls
   artifacts:
     paths:
+      - .
       - build
   only:
     - master
